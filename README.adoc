@@ -1,0 +1,166 @@
+// SPDX-License-Identifier: MPL-2.0
+= idris2-echidna
+
+image:https://img.shields.io/badge/License-MPL_2.0-blue.svg[MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"]
+image:https://img.shields.io/badge/Philosophy-Palimpsest-purple.svg[Palimpsest,link="https://github.com/hyperpolymath/palimpsest-licence"]
+image:https://img.shields.io/badge/Idris2-0.6+-blue.svg[Idris2]
+image:https://img.shields.io/badge/Status-Scaffolding-yellow.svg[Status]
+
+Idris2 FFI bindings to the https://github.com/hyperpolymath/echidna[ECHIDNA] neurosymbolic theorem proving platform.
+
+== Features
+
+* *12 Theorem Provers*: Type-safe access to Z3, CVC5, Agda, Coq, Lean 4, Isabelle, HOL Light, Mizar, Vampire, E Prover, TLC, and Alloy
+* *Dependent Types*: Leverage Idris2's type system to encode proof obligations
+* *Aspect Tagging*: Intelligent proof categorization and semantic search
+* *Neural Integration*: Natural language theorem input with neural translation
+* *Ecosystem Integration*: Works with idris2-dyadt (claims) and idris2-cno (CNOs)
+
+== Quick Start
+
+[source,idris]
+----
+import Echidna
+import Echidna.Prover.Z3
+
+||| Prove a simple arithmetic theorem
+example : IO ()
+example = do
+  let thm = theorem "(assert (forall ((x Int)) (= (+ x 0) x)))" SMTLib
+  result <- prove @{Z3Prover} thm
+  case result of
+    Left err => putStrLn $ "Error: " ++ show err
+    Right prf =>
+      if isProven prf
+        then putStrLn "Theorem proven!"
+        else putStrLn $ "Result: " ++ show prf.status
+----
+
+== Installation
+
+[source,bash]
+----
+# Clone the repository
+git clone https://github.com/hyperpolymath/idris2-echidna.git
+cd idris2-echidna
+
+# Build and install
+idris2 --install idris2-echidna.ipkg
+
+# Ensure ECHIDNA shared library is available
+export LD_LIBRARY_PATH=/path/to/echidna/lib:$LD_LIBRARY_PATH
+----
+
+== Supported Provers
+
+[cols="1,1,2,1"]
+|===
+|Prover |Tier |Description |Formats
+
+|Z3 |1 |SMT solver from Microsoft Research |SMT-LIB
+|CVC5 |1 |SMT solver |SMT-LIB
+|Agda |1 |Dependent type theory |Agda
+|Coq |1 |Interactive theorem prover |Gallina
+|Lean 4 |1 |Functional programming + proving |Lean4
+|Isabelle |1 |Higher-order logic |Isar
+|HOL Light |2 |Classical higher-order logic |HOL
+|Mizar |2 |Mathematical vernacular |Mizar
+|Vampire |1 |First-order ATP |TPTP
+|E Prover |1 |First-order ATP |TPTP
+|TLC |2 |TLA+ model checker |TLA+
+|Alloy |2 |Relational model checker |Alloy
+|===
+
+== Ecosystem Integration
+
+idris2-echidna is part of the hyperpolymath Idris2 verification stack:
+
+[source]
+----
+┌─────────────────────────────────────────────────────────────┐
+│                    Your Application                          │
+└─────────────────────────────────────────────────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+    ┌─────────┐           ┌─────────────┐         ┌─────────┐
+    │idris2-  │           │ idris2-     │         │idris2-  │
+    │ dyadt   │◄─────────►│ echidna     │◄───────►│  cno    │
+    │(claims) │           │ (provers)   │         │(CNOs)   │
+    └─────────┘           └─────────────┘         └─────────┘
+----
+
+=== With idris2-dyadt (Claims)
+
+[source,idris]
+----
+import Echidna.Integration.Dyadt
+
+-- Verify a complex claim using theorem proving
+verifyComplexClaim : Claim -> IO (Either ProverError ProofResult)
+verifyComplexClaim claim = do
+  let thm = encodeAsTheorem claim SMTLib
+  verifyWithStrategy (MultiProver [Z3, CVC5]) thm
+----
+
+=== With idris2-cno (Certified Null Operations)
+
+[source,idris]
+----
+import Echidna.Integration.CNO
+
+-- Prove a function is a CNO
+proveCNO : IO (Either ProverError ProofResult)
+proveCNO = do
+  let thm = cnoIdentityTheorem "myFunc" "Int"
+  prove @{Z3Prover} thm
+----
+
+== SMT-LIB Builder
+
+[source,idris]
+----
+import Echidna.Prover.Z3
+
+-- Build theorems programmatically
+myTheorem : Theorem
+myTheorem = MkTheorem "add_comm"
+  (SMTLib.forall [("x", "Int"), ("y", "Int")]
+    (SMTLib.equals "(+ x y)" "(+ y x)"))
+  SMTLib
+----
+
+== Architecture
+
+[source]
+----
+┌─────────────────────────────────────────────────────────────┐
+│                     Idris2 Application                      │
+├─────────────────────────────────────────────────────────────┤
+│                    idris2-echidna                           │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │   Echidna   │  │   Aspect    │  │ Integration │         │
+│  │   Prover    │  │   Tagging   │  │   Modules   │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+├─────────────────────────────────────────────────────────────┤
+│                     Echidna.FFI                             │
+│              (C FFI to libechidna.so)                       │
+├─────────────────────────────────────────────────────────────┤
+│                   ECHIDNA (Rust)                            │
+│  ┌─────┐ ┌─────┐ ┌──────┐ ┌─────┐ ┌────────┐ ┌──────────┐  │
+│  │ Z3  │ │CVC5 │ │ Agda │ │ Coq │ │ Lean 4 │ │ +7 more  │  │
+│  └─────┘ └─────┘ └──────┘ └─────┘ └────────┘ └──────────┘  │
+└─────────────────────────────────────────────────────────────┘
+----
+
+== Related Projects
+
+* https://github.com/hyperpolymath/echidna[ECHIDNA] - The neurosymbolic theorem proving platform
+* https://github.com/hyperpolymath/idris2-dyadt[idris2-dyadt] - Compile-time verified claims
+* https://github.com/hyperpolymath/idris2-cno[idris2-cno] - Certified Null Operations in Idris2
+* https://github.com/hyperpolymath/llm-verify[llm-verify] - LLM verification via ECHIDNA
+* https://github.com/hyperpolymath/did-you-actually-do-that[did-you-actually-do-that] - Runtime claim verification
+* https://github.com/hyperpolymath/absolute-zero[absolute-zero] - Formal CNO proofs
+
+== License
+
+MPL-2.0. See link:LICENSE[LICENSE] for details.

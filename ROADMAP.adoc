@@ -1,0 +1,119 @@
+// SPDX-License-Identifier: MPL-2.0
+= idris2-echidna Roadmap
+
+This document outlines the development roadmap for idris2-echidna.
+
+== Current Status: Scaffolding Complete (45%)
+
+The core library structure is in place with working integration modules.
+
+== Phase 1: Core FFI (Target: Q1 2025)
+
+=== Milestone 1.1: FFI Foundation
+* [ ] Create C header file (`echidna.h`) for FFI bindings
+* [ ] Implement memory management helpers for FFI boundary
+* [ ] Add error code translation from C to Idris2
+* [ ] Test basic FFI calls compile and link
+
+=== Milestone 1.2: Z3 Integration
+* [ ] Complete Z3 FFI implementation
+* [ ] Add SMT-LIB serialization/deserialization
+* [ ] Implement proof result parsing
+* [ ] Add unit tests with actual Z3 calls
+
+=== Milestone 1.3: Error Handling
+* [ ] Define comprehensive error types
+* [ ] Add timeout handling
+* [ ] Implement graceful degradation
+* [ ] Add logging/tracing support
+
+== Phase 2: Full Prover Support (Target: Q2 2025)
+
+=== Milestone 2.1: Tier 1 Provers
+* [ ] CVC5 implementation
+* [ ] Lean 4 implementation
+* [ ] Coq implementation
+* [ ] Agda implementation
+* [ ] Isabelle implementation
+* [ ] Vampire implementation
+* [ ] E Prover implementation
+
+=== Milestone 2.2: Tier 2 Provers
+* [ ] HOL Light implementation
+* [ ] Mizar implementation
+* [ ] TLC implementation
+* [ ] Alloy implementation
+
+=== Milestone 2.3: Format Translation
+* [ ] SMT-LIB ↔ TPTP translation
+* [ ] SMT-LIB ↔ Gallina translation
+* [ ] Universal theorem format
+* [ ] Format auto-detection
+
+== Phase 3: Advanced Features (Target: Q3 2025)
+
+=== Milestone 3.1: Neural Integration
+* [ ] Natural language theorem input
+* [ ] Neural proof search hints
+* [ ] Proof verbalization
+* [ ] Training data export
+
+=== Milestone 3.2: Multi-Prover Strategies
+* [ ] Parallel prover execution
+* [ ] Voting/consensus mechanisms
+* [ ] Prover selection heuristics
+* [ ] Caching and memoization
+
+=== Milestone 3.3: Aspect System Completion
+* [ ] Full aspect taxonomy
+* [ ] Semantic proof search
+* [ ] Proof similarity metrics
+* [ ] Aspect-based prover selection
+
+== Phase 4: Production Ready (Target: Q4 2025)
+
+=== Milestone 4.1: Testing & Quality
+* [ ] Property-based tests for all modules
+* [ ] Integration test suite
+* [ ] Performance benchmarks
+* [ ] Memory leak testing
+
+=== Milestone 4.2: Documentation
+* [ ] Complete API documentation
+* [ ] Tutorial series
+* [ ] Best practices guide
+* [ ] Troubleshooting guide
+
+=== Milestone 4.3: Distribution
+* [ ] Package on Idris2 package registry
+* [ ] Docker image with all provers
+* [ ] CI/CD pipeline
+* [ ] Release automation
+
+== Future Considerations
+
+=== Potential Features
+* Proof certificate export
+* Counterexample generation
+* Interactive proof mode
+* IDE integration (LSP)
+* Web service mode
+
+=== Research Directions
+* Proof compression
+* Cross-prover proof translation
+* Automated lemma discovery
+* Neural-guided proof search
+
+== Version History
+
+[cols="1,1,3"]
+|===
+|Version |Date |Notes
+
+|0.1.0 |2025-01-17 |Initial scaffold with core structure
+|===
+
+== Contributing
+
+See CONTRIBUTING.adoc for guidelines on contributing to this project.
