@@ -1,91 +1,41 @@
-; SPDX-License-Identifier: MPL-2.0
-; ECOSYSTEM.scm - Project ecosystem positioning
+;; SPDX-License-Identifier: MPL-2.0
+;; ECOSYSTEM.scm - Ecosystem relationships for idris2-echidna
 
 (ecosystem
-  (version "1.0")
+  (version "1.0.0")
   (name "idris2-echidna")
   (type "library")
-  (purpose "Idris2 FFI bindings to ECHIDNA neurosymbolic theorem proving platform")
+  (purpose "Theorem prover bindings for Idris2 dependent type verification")
 
   (position-in-ecosystem
-    "Bridge between Idris2's dependent type system and ECHIDNA's 12 theorem provers"
-    "Central proving backend for the hyperpolymath Idris2 verification stack"
-    "Enables external theorem proving when Idris2's type system is insufficient"
-    "Provides unified API across SMT solvers, ITPs, and ATP systems")
-
-  (ecosystem-diagram
-    "
-    ┌─────────────────────────────────────────────────────────────┐
-    │                    User Applications                         │
-    └─────────────────────────────────────────────────────────────┘
-                                 │
-         ┌───────────────────────┼───────────────────────┐
-         ▼                       ▼                       ▼
-    ┌─────────┐           ┌─────────────┐         ┌─────────┐
-    │idris2-  │           │ idris2-     │         │idris2-  │
-    │ dyadt   │◄─────────►│ echidna     │◄───────►│  cno    │
-    │(claims) │           │ (provers)   │         │(CNOs)   │
-    └─────────┘           └─────────────┘         └─────────┘
-                                 │
-                                 ▼
-                         ┌─────────────┐
-                         │  ECHIDNA    │
-                         │   (Rust)    │
-                         └─────────────┘
-                                 │
-         ┌──────────┬──────────┬┴───────────┬──────────┐
-         ▼          ▼          ▼            ▼          ▼
-       ┌───┐     ┌─────┐    ┌─────┐     ┌──────┐   ┌─────┐
-       │Z3 │     │Lean4│    │ Coq │     │Agda  │   │+8   │
-       └───┘     └─────┘    └─────┘     └──────┘   └─────┘
-    ")
+    (role "foundation")
+    (layer "prover-interface")
+    (description "Provides the interface between Idris2 code and external theorem provers"))
 
   (related-projects
-    (echidna
-      (relationship "upstream-dependency")
-      (integration "FFI to libechidna.so")
-      (description "The core theorem proving platform this binds to"))
-    (idris2-dyadt
-      (relationship "downstream-consumer")
-      (integration "Echidna.Integration.Dyadt module")
-      (description "Uses echidna to verify complex claims"))
-    (idris2-cno
-      (relationship "downstream-consumer")
-      (integration "Echidna.Integration.CNO module")
-      (description "Uses echidna to prove CNO properties"))
-    (llm-verify
-      (relationship "ecosystem-sibling")
-      (integration "Same ECHIDNA backend")
-      (description "Haskell equivalent using same proving backend"))
-    (did-you-actually-do-that
-      (relationship "conceptual-ancestor")
-      (integration "Claim patterns inspired design")
-      (description "Runtime verification that inspired compile-time approach"))
-    (absolute-zero
-      (relationship "proof-source")
-      (integration "Can verify absolute-zero theorems")
-      (description "Formal CNO proofs from multiple proof assistants")))
+    (project "idris2-dyadt"
+      (relationship "consumer")
+      (description "Uses echidna to verify dyadt claims with theorem provers"))
 
-  (integration-points
-    (provides
-      "Prover interface for arbitrary theorem proving"
-      "SMT-LIB builder for theorem construction"
-      "Aspect tagging for proof categorization"
-      "Multi-prover orchestration")
-    (consumes
-      "ECHIDNA library via FFI"
-      "External prover installations"))
+    (project "idris2-cno"
+      (relationship "sibling")
+      (description "Certified Null Operations - can use echidna for external verification"))
+
+    (project "Z3"
+      (relationship "external-dependency")
+      (description "Microsoft's SMT solver - primary backend"))
+
+    (project "CVC5"
+      (relationship "external-dependency")
+      (description "Stanford's SMT solver - alternative backend")))
 
   (what-this-is
-    "FFI bindings to ECHIDNA's 12 theorem provers"
-    "Type-safe prover interface for Idris2"
-    "Aspect tagging system for proof categorization"
-    "SMT-LIB builder helpers for theorem construction"
-    "Integration layer for dyadt claims and CNO proofs"
-    "Session management for prover connections")
+    "Idris2 FFI bindings to theorem provers"
+    "Type-safe prover invocation"
+    "Multi-prover strategy support"
+    "SMT-LIB formula encoding utilities")
 
   (what-this-is-not
-    "Not a standalone theorem prover (uses external provers)"
-    "Not a replacement for native Idris2 proofs (complementary)"
-    "Not a proof assistant GUI (library only)"
-    "Not the provers themselves (bindings only)"))
+    "A theorem prover itself"
+    "A proof assistant"
+    "A replacement for Idris2's built-in verification"))

@@ -1,102 +1,50 @@
-; SPDX-License-Identifier: MPL-2.0
-; META.scm - Project metadata and architectural decisions
+;; SPDX-License-Identifier: MPL-2.0
+;; META.scm - Meta-level information for idris2-echidna
 
 (meta
-  (version "1.0")
-  (project "idris2-echidna")
-
   (architecture-decisions
     (adr-001
+      (title "Use dependent types for proof verification")
       (status "accepted")
       (date "2025-01-17")
-      (title "Use C FFI for ECHIDNA integration")
-      (context "Need to call ECHIDNA's Rust library from Idris2")
-      (decision "Use Idris2's C FFI with ECHIDNA's C-compatible API")
+      (context "Need to ensure proof results are type-safe and verifiable at compile time")
+      (decision "Use Idris2 dependent types to encode proof validity in the type system")
       (consequences
-        "Requires ECHIDNA to expose C-compatible functions"
-        "Need to handle memory management at FFI boundary"
-        "Portable across platforms that support C ABI"))
+        "Proofs are verified at compile time"
+        "Invalid proofs cannot be constructed"
+        "Requires understanding of dependent types to use"))
 
     (adr-002
+      (title "Prover-agnostic core API")
       (status "accepted")
       (date "2025-01-17")
-      (title "Interface-based prover abstraction")
-      (context "Need unified API for 12 different provers")
-      (decision "Use Idris2 interfaces to define Prover typeclass")
+      (context "Multiple theorem provers exist with different interfaces")
+      (decision "Define abstract Prover interface with concrete implementations per prover")
       (consequences
-        "Each prover can have custom implementation"
-        "Users can select prover at type level"
-        "Enables prover-specific optimizations"))
+        "Easy to add new provers"
+        "Consistent API across provers"
+        "Some prover-specific features may be harder to expose"))
 
     (adr-003
-      (status "accepted")
+      (title "FFI for native prover integration")
+      (status "proposed")
       (date "2025-01-17")
-      (title "Aspect tagging for proof organization")
-      (context "Need to categorize and search proofs semantically")
-      (decision "Implement aspect tagging system matching ECHIDNA's")
+      (context "Native prover bindings would be faster than process spawning")
+      (decision "Use Idris2 FFI for provers with C APIs, fall back to process for others")
       (consequences
-        "Proofs can be tagged by domain, technique, complexity"
-        "Enables semantic search across proof libraries"))
-
-    (adr-004
-      (status "accepted")
-      (date "2025-01-17")
-      (title "Prover tier system")
-      (context "Provers have different capabilities and reliability")
-      (decision "Implement 4-tier system: Tier1 (core SMT + dependent), Tier2 (classical), Tier3 (specialized), Tier4 (legacy)")
-      (consequences
-        "Users can target appropriate tier for their needs"
-        "Tier guides prover selection strategies"))
-
-    (adr-005
-      (status "accepted")
-      (date "2025-01-17")
-      (title "Integration modules for ecosystem")
-      (context "Need to work with idris2-dyadt and idris2-cno")
-      (decision "Create dedicated Integration.* modules for each sibling library")
-      (consequences
-        "Clean separation of concerns"
-        "Optional dependencies - base echidna works standalone"
-        "Easy to extend for future ecosystem libraries")))
+        "Better performance for supported provers"
+        "More complex build setup"
+        "Platform-specific considerations")))
 
   (development-practices
-    (code-style
-      "Follow Idris2 standard naming conventions"
-      "Use total functions where possible (%default total)"
-      "Public exports explicit with 'public export'"
-      "Document all public functions with ||| comments")
-    (security
-      "Validate all FFI inputs"
-      "Sandbox prover execution where possible"
-      "No arbitrary code execution from provers")
-    (testing
-      "Type-checking as primary test"
-      "Property-based tests for FFI boundary"
-      "Integration tests with actual provers")
-    (versioning "Semantic versioning (SemVer)")
-    (documentation
-      "README.adoc with quick start"
-      "Doc comments on all public APIs"
-      "Examples directory with working code")
-    (branching
-      "main is stable"
-      "feature/* for new features"
-      "fix/* for bug fixes"))
+    (code-style "Follow Idris2 community style guide")
+    (security "Sanitize all inputs to provers")
+    (testing "Unit tests for each prover module")
+    (versioning "Semantic versioning")
+    (documentation "Module-level doc comments")
+    (branching "main for stable, feature/* for development"))
 
   (design-rationale
-    (why-idris2
-      "Dependent types enable encoding proof obligations in types"
-      "Strong compile-time guarantees"
-      "Good FFI story for external integration")
-    (why-ffi
-      "ECHIDNA is Rust-based; FFI is most practical integration"
-      "Avoid reimplementing 12 provers in Idris2"
-      "Leverage existing battle-tested implementations")
-    (why-multiple-provers
-      "Different provers excel at different domains"
-      "Redundancy for verification confidence"
-      "User choice based on problem characteristics")
-    (why-separate-integration-modules
-      "Keep core echidna minimal and focused"
-      "Allow ecosystem libraries to be optional"
-      "Reduce compile times for users not needing all integrations")))
+    (why-idris2 "Dependent types enable compile-time proof verification")
+    (why-multiple-provers "Different provers excel at different problem domains")
+    (why-smt-lib-encoding "Standard format supported by many provers")))
