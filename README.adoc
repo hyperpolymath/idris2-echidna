@@ -94,6 +94,70 @@ export LD_LIBRARY_PATH=/path/to/echidna/lib:$LD_LIBRARY_PATH
 * Idris2 >= 0.6.0
 * `base`, `contrib`, `network` packages (included with Idris2)
 
+== API Reference
+
+=== Creating Theorems
+
+[source,idris]
+----
+import Echidna.Prover
+
+-- Simple theorem using helper
+simpleThm : Theorem
+simpleThm = theorem "(assert (= 1 1))" SMTLib
+
+-- Full theorem with all fields
+fullThm : Theorem
+fullThm = MkTheorem
+  "(assert (forall ((x Int)) (>= (* x x) 0)))"  -- statement
+  SMTLib                                         -- format
+  (Just "squares are non-negative")              -- context
+  ["real", "arithmetic"]                         -- hints
+----
+
+=== Working with ProofResults
+
+[source,idris]
+----
+import Echidna.Prover
+
+-- Check proof status
+handleResult : ProofResult -> IO ()
+handleResult result = do
+  putStrLn $ "Prover: " ++ show result.prover
+  putStrLn $ "Time: " ++ show result.timeTaken ++ "ms"
+  case result.status of
+    Proven => putStrLn "Success! Theorem proven."
+    Counterexample ce => putStrLn $ "Counterexample found: " ++ ce
+    Inconclusive => putStrLn "Could not determine."
+    ProofError e => putStrLn $ "Error: " ++ show e
+
+  -- Check confidence for neural proofs
+  when (result.confidence > 0.9) $
+    putStrLn "High confidence result"
+----
+
+=== Supported Formats
+
+[source,idris]
+----
+import Echidna.Prover
+
+-- Check if a prover supports a format
+canProve : ProverKind -> TheoremFormat -> Bool
+canProve prover fmt = supportsFormat prover fmt
+
+-- Get all formats for a prover
+z3Formats : List TheoremFormat
+z3Formats = supportedFormats Z3  -- [SMTLib, NaturalLang]
+
+-- Natural language input (neural translation)
+naturalThm : Theorem
+naturalThm = theorem
+  "For all integers x, x times zero equals zero"
+  NaturalLang
+----
+
 == Supported Provers
 
 [cols="1,1,2,1"]
